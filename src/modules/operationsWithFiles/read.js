@@ -1,8 +1,5 @@
 import { createReadStream } from 'fs';
 import { validatePath } from '../explorer/index.js';
-import { pipeline } from 'stream/promises';
-import { EOL } from 'os';
-import { stdout } from 'process';
 
 export const read = async (pathToFile) => {
   try {

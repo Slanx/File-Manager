@@ -8,7 +8,6 @@ export const moveToDirectory = async (pathToFile) => {
 
     currentPathUpdate(normalize(pathToFile));
   } catch (e) {
-    // console.error('Operation failed');
-    console.log(e);
+    console.error('Operation failed');
   }
 };

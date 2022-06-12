@@ -18,7 +18,6 @@ import {
   compress,
   decompress,
 } from './modules/operationsWithFiles/index.js';
-import { exit } from 'process';
 
 const parseArgs = (symbolsToParse) => {
   const argument = process.argv[2];
@@ -39,7 +38,7 @@ const rl = readline.createInterface({
 });
 
 const commands = {
-  ls: list.bind(null, currentPath),
+  ls: list,
   cd: moveToDirectory,
   up: moveToUpDirectory,
   os: getOsInfo,
@@ -61,28 +60,33 @@ rl.on('line', async (commandLine, error) => {
   try {
     if (error) throw error;
 
-    if (commandLine === '.exit') {
+    const command = commandLine.split(' ')[0];
+    const strArgs = commandLine.slice(command.length + 1);
+
+    const cmdArgs = parseCmdArgs(strArgs);
+
+    if (command === '.exit') {
       rl.close();
-    } else {
-      const command = commandLine.split(' ')[0];
-      const cmdArgs = commandLine.slice(command.length + 1).split(' ');
+    }
 
-      if (cmdArgs.length > 2) {
-        throw new Error('\nInvalid input\n');
+    if (cmdArgs.length > 2) {
+      throw new Error('\nInvalid input\n');
+    }
+
+    const pathArgs = cmdArgs.map((item) => {
+      const validItem = item.replaceAll(/[\'\"\`]/g, '');
+      return getPath(validItem);
+    });
+
+    try {
+      if (command === 'os') {
+        await commands[command](...cmdArgs);
+      } else {
+        await commands[command](...pathArgs);
       }
-
-      const pathArgs = cmdArgs.map((item) => getPath(item));
-
-      try {
-        if (command === 'os') {
-          await commands[command](...cmdArgs);
-        } else {
-          await commands[command](...pathArgs);
-        }
-        console.log(`\nYou are currently in ${currentPath}\n`);
-      } catch (e) {
-        throw new Error('\nInvalid input\n');
-      }
+      console.log(`\nYou are currently in ${currentPath}\n`);
+    } catch (e) {
+      throw new Error('\nInvalid input\n');
     }
   } catch (e) {
     console.error(e.message);
@@ -94,6 +98,29 @@ rl.on('SIGNINT', () => {
 });
 
 rl.on('close', (error) => {
-  console.log(`\nThank you for using File Manager,${username}!`);
+  console.log(`Thank you for using File Manager,${username}!`);
   if (error) throw error;
 });
+
+function parseCmdArgs(str) {
+  let counter = 0;
+  let arrOfArgs = [];
+  let arr = [];
+
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === "'" || str[i] === '"' || str[i] === '`') {
+      counter++;
+    }
+    if (counter % 2 === 0 && counter !== 0 && str[i] === ' ') {
+      arrOfArgs.push(arr.join(''));
+      arr = [];
+    } else {
+      arr.push(str[i]);
+    }
+
+    if (i === str.length - 1) {
+      arrOfArgs.push(arr.join(''));
+    }
+  }
+  return arrOfArgs;
+}

@@ -1,5 +1,4 @@
 import { createReadStream } from 'fs';
-import { stdout } from 'process';
 const { createHash } = await import('crypto');
 import { validatePath } from '../explorer/index.js';
 
