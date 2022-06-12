@@ -8,7 +8,6 @@ export const copy = async (pathToFiles, pathToFilesCopy) => {
     const isFile = (await stat(pathToFiles)).isFile();
 
     await validatePath(pathToFilesCopy, true);
-    console.log(pathToFilesCopy);
     const fileName = path.basename(pathToFiles);
     const pathToDesition = path.join(pathToFilesCopy, fileName);
 
