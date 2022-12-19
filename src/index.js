@@ -111,7 +111,7 @@ function parseCmdArgs(str) {
     if (str[i] === "'" || str[i] === '"' || str[i] === '`') {
       counter++;
     }
-    if (counter % 2 === 0 && counter !== 0 && str[i] === ' ') {
+    if (counter % 2 === 0 && str[i] === ' ') {
       arrOfArgs.push(arr.join(''));
       arr = [];
     } else {
@@ -121,6 +121,8 @@ function parseCmdArgs(str) {
     if (i === str.length - 1) {
       arrOfArgs.push(arr.join(''));
     }
+    console.log(arrOfArgs, arr);
   }
+
   return arrOfArgs;
 }
